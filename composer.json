@@ -1,5 +1,5 @@
 {
-    "name": "cbsi/doctrine2-nestedset",
+    "name": "creatim/credo-doctrine2-nestedset",
     "type": "library",
     "description": "This Doctrine2 extension implements the nested set model (modified pre-order tree traversal algorithm) for Doctrine2. ",
     "keywords": ["doctrine2", "extentions", "nested set"],
