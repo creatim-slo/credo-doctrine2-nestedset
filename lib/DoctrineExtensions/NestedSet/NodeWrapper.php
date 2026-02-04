@@ -265,7 +265,7 @@ class NodeWrapper implements Node
 				$q = $this->getManager()->addHintToQuery($q);
 			}
 			$results = $q->getResult();
-			
+
             $this->parent = $this->getManager()->wrapNode($results[0]);
         }
 
@@ -439,7 +439,7 @@ class NodeWrapper implements Node
             return implode(array_slice($this->outlineNumbers, 1), $separator);
         }
 
-        return implode($this->outlineNumbers, $separator);
+        return implode($separator, $this->outlineNumbers);
     }
 
 
@@ -1281,7 +1281,7 @@ class NodeWrapper implements Node
         {
             // Prepare left & right query
             $metadata = $em->getClassMetadata(get_class($this->getNode()));
-            $q = $em->createQueryBuilder()            
+            $q = $em->createQueryBuilder()
             ->update($metadata->rootEntityName, 'n')
             ->set("n.$field", "n.$field + :delta")
             ->setParameter('delta', $delta)
