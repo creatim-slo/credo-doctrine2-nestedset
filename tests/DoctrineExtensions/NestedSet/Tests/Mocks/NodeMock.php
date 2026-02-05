@@ -27,45 +27,35 @@ use DoctrineExtensions\NestedSet\MultipleRootNode;
 class NodeMock implements MultipleRootNode
 {
     /**
-     * @Id @Column(type="integer")
-     * @GeneratedValue
-     */
-    private $id;
-
-    /**
-     * @Column(type="integer")
-     */
-    private $lft;
-
-    /**
-     * @Column(type="integer")
-     */
-    private $rgt;
-
-    /**
-     * @Column(type="string", length="16")
-     */
-    private $name;
-
-    /**
-     * @Column(type="integer")
-     */
-    private $root;
-
-
-    /**
      * @OneToOne(targetEntity="RelatedObj", inversedBy="node", fetch="LAZY", cascade={"persist"})
      * @JoinColumn(name="related_id", referencedColumnName="id", nullable="true")
      */
     private $related;
 
-    public function __construct($id, $name=null, $lft=null, $rgt=null, $root=1)
+    public function __construct(
+        /**
+         * @Id @Column(type="integer")
+         * @GeneratedValue
+         */
+        private $id,
+        /**
+         * @Column(type="string", length="16")
+         */
+        private $name=null,
+        /**
+         * @Column(type="integer")
+         */
+        private $lft=null,
+        /**
+         * @Column(type="integer")
+         */
+        private $rgt=null,
+        /**
+         * @Column(type="integer")
+         */
+        private $root=1
+    )
     {
-        $this->id  = $id;
-        $this->lft = $lft;
-        $this->rgt = $rgt;
-        $this->root = $root;
-        $this->name = $name;
     }
 
     public function getId() { return $this->id; }
@@ -82,7 +72,7 @@ class NodeMock implements MultipleRootNode
     public function getName() { return $this->name; }
     public function setName($name) { $this->name = $name; }
 
-    public function __toString() { return $this->name; }
+    public function __toString(): string { return (string) $this->name; }
 
     public function getRelatedObj() { return $this->related; }
     public function setRelatedObj($related) { $this->related = $related; }

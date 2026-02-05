@@ -49,10 +49,10 @@ abstract class DatabaseTest extends \PHPUnit_Framework_TestCase
      */
     protected function _createEntityManager()
     {
-        $conn = \Doctrine\DBAL\DriverManager::getConnection(array(
+        $conn = \Doctrine\DBAL\DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
             'memory' => true
-        ));
+        ]);
 
         $config = new \Doctrine\ORM\Configuration();
         $config->setProxyDir(__DIR__ . '/../Proxies');

@@ -36,36 +36,36 @@ class NodeWrapperTest extends DatabaseTest
     protected function setUp()
     {
         $em = $this->getEntityManager();
-        $this->loadSchema(array($em->getClassMetadata('DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock')));
+        $this->loadSchema([$em->getClassMetadata(\DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock::class)]);
 
-        $this->nsm = new ManagerMock($em, 'DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock');
+        $this->nsm = new ManagerMock($em, \DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock::class);
 
-        $this->nodes = array(
+        $this->nodes = [
             new NodeMock(1, '1', 1, 10),               # 0
                 new NodeMock(2, '1.1', 2, 7),          # 1
                     new NodeMock(3, '1.1.1', 3, 4),    # 2
                     new NodeMock(4, '1.1.2', 5, 6),    # 3
                 new NodeMock(5, '1.2', 8, 9),          # 4
-        );
+        ];
 
-        $this->nodes2 = array(
+        $this->nodes2 = [
             new NodeMock(11, '1', 1, 12, 2),           # 0
                new NodeMock(12, '1.1', 2, 7, 2),       # 1
                    new NodeMock(13, '1.1.1', 3, 4, 2), # 2
                    new NodeMock(14, '1.1.2', 5, 6, 2), # 3
                new NodeMock(15, '1.2', 8, 9, 2),       # 4
                new NodeMock(16, '1.3', 10, 11, 2),     # 5
-        );
+        ];
 
 
-        $this->wrappers = array();
+        $this->wrappers = [];
         foreach($this->nodes as $node)
         {
             $em->persist($node);
             $this->wrappers[] = $this->nsm->wrapNode($node);
         }
 
-        $this->wrappers2 = array();
+        $this->wrappers2 = [];
         foreach($this->nodes2 as $node)
         {
             $em->persist($node);
@@ -81,7 +81,7 @@ class NodeWrapperTest extends DatabaseTest
      */
     public function testConstructor()
     {
-        $this->assertType('DoctrineExtensions\NestedSet\NodeWrapper', new NodeWrapper($this->nodes[2], $this->nsm), '->__construct() works');
+        $this->assertType(\DoctrineExtensions\NestedSet\NodeWrapper::class, new NodeWrapper($this->nodes[2], $this->nsm), '->__construct() works');
     }
 
 
@@ -253,8 +253,8 @@ class NodeWrapperTest extends DatabaseTest
     {
         $a = $this->wrappers[3]->getAncestors();
         $this->assertEquals(
-            array($this->nodes[0]->getId(), $this->nodes[1]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $a)
+            [$this->nodes[0]->getId(), $this->nodes[1]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $a)
         );
 
         $this->assertEmpty($this->wrappers[0]->getAncestors());
@@ -301,8 +301,8 @@ class NodeWrapperTest extends DatabaseTest
     {
         $d = $this->wrappers[1]->getDescendants();
         $this->assertEquals(
-            array($this->nodes[2]->getId(), $this->nodes[3]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $d),
+            [$this->nodes[2]->getId(), $this->nodes[3]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $d),
             '->getDescendants() depth=unlimited'
         );
 
@@ -310,15 +310,15 @@ class NodeWrapperTest extends DatabaseTest
 
         $d = $this->wrappers[0]->getDescendants(1);
         $this->assertEquals(
-            array($this->nodes[1]->getId(), $this->nodes[4]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $d),
+            [$this->nodes[1]->getId(), $this->nodes[4]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $d),
             '->getDescendants() depth=1'
         );
 
         $d = $this->wrappers[0]->getDescendants(2);
         $this->assertEquals(
-            array($this->nodes[1]->getId(), $this->nodes[2]->getId(), $this->nodes[3]->getId(), $this->nodes[4]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $d),
+            [$this->nodes[1]->getId(), $this->nodes[2]->getId(), $this->nodes[3]->getId(), $this->nodes[4]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $d),
             '->getDescendants() depth=2'
         );
     }
@@ -399,15 +399,15 @@ class NodeWrapperTest extends DatabaseTest
     {
         $siblings = $this->wrappers[2]->getSiblings();
         $this->assertEquals(
-            array($this->nodes[3]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $siblings),
+            [$this->nodes[3]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $siblings),
             '->getSiblings() excludes current node by default'
         );
 
         $siblings = $this->wrappers[2]->getSiblings(true);
         $this->assertEquals(
-            array($this->nodes[2]->getId(), $this->nodes[3]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $siblings),
+            [$this->nodes[2]->getId(), $this->nodes[3]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $siblings),
             '->getSiblings() includes current node'
         );
     }
@@ -447,14 +447,14 @@ class NodeWrapperTest extends DatabaseTest
     {
         $c = $this->wrappers[1]->getChildren();
         $this->assertEquals(
-            array($this->nodes[2]->getId(), $this->nodes[3]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $c)
+            [$this->nodes[2]->getId(), $this->nodes[3]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $c)
         );
 
         $c = $this->wrappers[0]->getChildren();
         $this->assertEquals(
-            array($this->nodes[1]->getId(), $this->nodes[4]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $c)
+            [$this->nodes[1]->getId(), $this->nodes[4]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $c)
         );
 
         $this->assertEmpty($this->wrappers[2]->getChildren(), 'no children');
@@ -879,7 +879,7 @@ class NodeWrapperTest extends DatabaseTest
     public function testAddChild_Node()
     {
         $newWrapper = $this->wrappers[1]->addChild(new NodeMock(6, '1.1.3', 0, 0, 0));
-        $this->assertInstanceOf('DoctrineExtensions\NestedSet\NodeWrapper', $newWrapper, '->addChild() returns a NodeWrapper');
+        $this->assertInstanceOf(\DoctrineExtensions\NestedSet\NodeWrapper::class, $newWrapper, '->addChild() returns a NodeWrapper');
         $this->assertEquals(7, $newWrapper->getLeftValue(), '->addChild() updates new node\'s left value');
         $this->assertEquals(8, $newWrapper->getRightValue(), '->addChild() updates new node\'s right value');
         $this->assertEquals(1, $newWrapper->getRootValue(), '->addChild() updates new node\'s root value');
