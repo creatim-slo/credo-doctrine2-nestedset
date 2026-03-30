@@ -34,7 +34,7 @@ class ManagerTest extends DatabaseTest
 
     public function setUp()
     {
-        $this->nsm = new ManagerMock($this->getEntityManager(), 'DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock');
+        $this->nsm = new ManagerMock($this->getEntityManager(), \DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock::class);
     }
 
     public function setUpDb($em=null)
@@ -44,7 +44,7 @@ class ManagerTest extends DatabaseTest
             $em = $this->getEntityManager();
         }
 
-        $this->loadSchema(array($em->getClassMetadata('DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock')));
+        $this->loadSchema([$em->getClassMetadata(\DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock::class)]);
     }
 
     protected function loadData()
@@ -52,22 +52,22 @@ class ManagerTest extends DatabaseTest
         $this->setUpDb();
         $em = $this->getEntityManager();
 
-        $this->nodes = array(
+        $this->nodes = [
             new NodeMock(1, '1', 1, 10),               # 0
                 new NodeMock(2, '1.1', 2, 7),          # 1
                     new NodeMock(3, '1.1.1', 3, 4),    # 2
                     new NodeMock(4, '1.1.2', 5, 6),    # 3
                 new NodeMock(5, '1.2', 8, 9),          # 4
-        );
+        ];
 
-        $this->nodes2 = array(
+        $this->nodes2 = [
             new NodeMock(11, '1', 1, 12, 2),           # 0
                new NodeMock(12, '1.1', 2, 7, 2),       # 1
                    new NodeMock(13, '1.1.1', 3, 4, 2), # 2
                    new NodeMock(14, '1.1.2', 5, 6, 2), # 3
                new NodeMock(15, '1.2', 8, 9, 2),       # 4
                new NodeMock(16, '1.3', 10, 11, 2),     # 5
-        );
+        ];
 
 
         foreach($this->nodes as $node)
@@ -75,7 +75,7 @@ class ManagerTest extends DatabaseTest
             $em->persist($node);
         }
 
-        $this->wrappers2 = array();
+        $this->wrappers2 = [];
         foreach($this->nodes2 as $node)
         {
             $em->persist($node);
@@ -90,7 +90,7 @@ class ManagerTest extends DatabaseTest
      */
     public function testConstructor()
     {
-        $this->assertInstanceOf('DoctrineExtensions\NestedSet\Manager', $this->nsm);
+        $this->assertInstanceOf(\DoctrineExtensions\NestedSet\Manager::class, $this->nsm);
     }
 
 
@@ -123,7 +123,7 @@ class ManagerTest extends DatabaseTest
         $this->assertNull($this->nsm->fetchTree(10), '->fetchTree() returns null when no nodes exist');
 
         $root = $this->nsm->fetchTree(1);
-        $this->assertInstanceOf('DoctrineExtensions\NestedSet\NodeWrapper', $root, '->fetchTree() returns a NodeWrapper object');
+        $this->assertInstanceOf(\DoctrineExtensions\NestedSet\NodeWrapper::class, $root, '->fetchTree() returns a NodeWrapper object');
 
         //
         // NOTE: Testing private variables
@@ -136,21 +136,21 @@ class ManagerTest extends DatabaseTest
 
         $this->assertEquals($nodes[0]->getId(), $root->getId(), '->fetchTree() root id is correct');
         $this->assertAttributeEquals(0, 'level', $root, '->fetchTree() root level is correct');
-        $this->assertAttributeEquals(array(1), 'outlineNumbers', $root, '->fetchTree() root outlineNumbers is correct');
+        $this->assertAttributeEquals([1], 'outlineNumbers', $root, '->fetchTree() root outlineNumbers is correct');
         $this->assertEmpty($root_ancestors, '->fetchTree() root ancestors is empty');
         $this->assertNull($root_parent, '->fetchTree() root parent is null');
         $this->assertEquals(
-            array($nodes[1]->getId(), $nodes[4]->getId()),
-            array_map(function($e) {return $e->getNode()->getId();}, $root_children),
+            [$nodes[1]->getId(), $nodes[4]->getId()],
+            array_map(fn($e) => $e->getNode()->getId(), $root_children),
             '->fetchTree() root children populated'
         );
         $this->assertEquals(
-            array($nodes[1]->getId(), $nodes[2]->getId(), $nodes[3]->getId(), $nodes[4]->getId()),
-            array_map(function($e) {return $e->getNode()->getId();}, $root_descendants),
+            [$nodes[1]->getId(), $nodes[2]->getId(), $nodes[3]->getId(), $nodes[4]->getId()],
+            array_map(fn($e) => $e->getNode()->getId(), $root_descendants),
             '->fetchTree() root descendants populated'
         );
         $this->assertAttributeEquals(1, 'level', $root_children[0], '->fetchTree() root children level is correct');
-        $this->assertAttributeEquals(array(1,1), 'outlineNumbers', $root_children[0], '->fetchTree() root children outlineNumbers is correct');
+        $this->assertAttributeEquals([1,1], 'outlineNumbers', $root_children[0], '->fetchTree() root children outlineNumbers is correct');
 
 
         $node1_parent = $this->readAttribute($root_children[0], 'parent');
@@ -160,22 +160,22 @@ class ManagerTest extends DatabaseTest
 
         $this->assertEquals($nodes[0]->getId(), $node1_parent->getNode()->getId(), '->fetchTree() first child parent is correct');
         $this->assertEquals(
-            array($nodes[0]->getId()),
-            array_map(function($e) {return $e->getNode()->getId();}, $node1_ancestors),
+            [$nodes[0]->getId()],
+            array_map(fn($e) => $e->getNode()->getId(), $node1_ancestors),
             '->fetchTree() first child ancestors is correct'
         );
         $this->assertEquals(
-            array($nodes[2]->getId(), $nodes[3]->getId()),
-            array_map(function($e) {return $e->getNode()->getId();}, $node1_children),
+            [$nodes[2]->getId(), $nodes[3]->getId()],
+            array_map(fn($e) => $e->getNode()->getId(), $node1_children),
             '->fetchTree() first child children populated'
         );
         $this->assertEquals(
-            array($nodes[2]->getId(), $nodes[3]->getId()),
-            array_map(function($e) {return $e->getNode()->getId();}, $node1_descendants),
+            [$nodes[2]->getId(), $nodes[3]->getId()],
+            array_map(fn($e) => $e->getNode()->getId(), $node1_descendants),
             '->fetchTree() first child descendants populated'
         );
         $this->assertAttributeEquals(2, 'level', $node1_children[0], '->fetchTree() node 1 children level is correct');
-        $this->assertAttributeEquals(array(1,1,2), 'outlineNumbers', $node1_children[1], '->fetchTree() node 1 children outlineNumbers is correct');
+        $this->assertAttributeEquals([1,1,2], 'outlineNumbers', $node1_children[1], '->fetchTree() node 1 children outlineNumbers is correct');
 
 
         $node3_parent = $this->readAttribute($root_descendants[2], 'parent');
@@ -184,8 +184,8 @@ class ManagerTest extends DatabaseTest
         $node3_descendants = $this->readAttribute($root_descendants[2], 'descendants');
         $this->assertEquals($nodes[1]->getId(), $node3_parent->getNode()->getId(), '->fetchTree() leaf parent is correct');
         $this->assertEquals(
-            array($nodes[0]->getId(), $nodes[1]->getId()),
-            array_map(function($e) {return $e->getNode()->getId();}, $node3_ancestors),
+            [$nodes[0]->getId(), $nodes[1]->getId()],
+            array_map(fn($e) => $e->getNode()->getId(), $node3_ancestors),
             '->fetchTree() leaf ancestors is correct'
         );
         $this->assertEmpty($node3_children, '->fetchTree() leaf children is empty');
@@ -207,7 +207,7 @@ class ManagerTest extends DatabaseTest
         $this->assertNull($this->nsm->fetchTree(1, 0));
 
         $root = $this->nsm->fetchTree(1, 2);
-        $this->assertInstanceOf('DoctrineExtensions\NestedSet\NodeWrapper', $root, '->fetchTree() returns a NodeWrapper object');
+        $this->assertInstanceOf(\DoctrineExtensions\NestedSet\NodeWrapper::class, $root, '->fetchTree() returns a NodeWrapper object');
 
         //
         // NOTE: Testing private variables
@@ -236,7 +236,7 @@ class ManagerTest extends DatabaseTest
         $this->assertNull($this->nsm->fetchBranch(-10), '->fetchBranch() returns null when branch node doesn\'t exist');
 
         $root = $this->nsm->fetchBranch(2);
-        $this->assertInstanceOf('DoctrineExtensions\NestedSet\NodeWrapper', $root, '->fetchBranch() returns a NodeWrapper object');
+        $this->assertInstanceOf(\DoctrineExtensions\NestedSet\NodeWrapper::class, $root, '->fetchBranch() returns a NodeWrapper object');
 
         //
         // NOTE: Testing private variables
@@ -249,20 +249,20 @@ class ManagerTest extends DatabaseTest
 
         $this->assertEquals($nodes[1]->getId(), $root->getId(), '->fetchBranch() start id is correct');
         $this->assertAttributeEquals(1, 'level', $root, '->fetchBranch() start level is correct');
-        $this->assertAttributeEquals(array(1,1), 'outlineNumbers', $root, '->fetchBranch() start outlineNumbers is correct');
+        $this->assertAttributeEquals([1,1], 'outlineNumbers', $root, '->fetchBranch() start outlineNumbers is correct');
         $this->assertNull($root_parent, '->fetchBranch() start parent is null');
         $this->assertEquals(
-            array($nodes[2]->getId(), $nodes[3]->getId()),
-            array_map(function($e) {return $e->getNode()->getId();}, $root_children),
+            [$nodes[2]->getId(), $nodes[3]->getId()],
+            array_map(fn($e) => $e->getNode()->getId(), $root_children),
             '->fetchBranch() start children populated'
         );
         $this->assertEquals(
-            array($nodes[2]->getId(), $nodes[3]->getId()),
-            array_map(function($e) {return $e->getNode()->getId();}, $root_descendants),
+            [$nodes[2]->getId(), $nodes[3]->getId()],
+            array_map(fn($e) => $e->getNode()->getId(), $root_descendants),
             '->fetchBranch() start descendants populated'
         );
         $this->assertAttributeEquals(2, 'level', $root_children[0], '->fetchBranch() child level is correct');
-        $this->assertAttributeEquals(array(1,1,2), 'outlineNumbers', $root_children[1], '->fetchBranch() child outlineNumbers is correct');
+        $this->assertAttributeEquals([1,1,2], 'outlineNumbers', $root_children[1], '->fetchBranch() child outlineNumbers is correct');
 
 
         $node2_parent = $this->readAttribute($root_children[0], 'parent');
@@ -272,8 +272,8 @@ class ManagerTest extends DatabaseTest
 
         $this->assertEquals($nodes[1]->getId(), $node2_parent->getNode()->getId(), '->fetchBranch() first child parent is correct');
         $this->assertEquals(
-            array($nodes[1]->getId()),
-            array_map(function($e) {return $e->getNode()->getId();}, $node2_ancestors),
+            [$nodes[1]->getId()],
+            array_map(fn($e) => $e->getNode()->getId(), $node2_ancestors),
             '->fetchBranch() first child ancestors is correct'
         );
         $this->assertEmpty($node2_children, '->fetchBranch() first child children populated');
@@ -295,7 +295,7 @@ class ManagerTest extends DatabaseTest
         $this->assertNull($this->nsm->fetchBranch(2, 0));
 
         $root = $this->nsm->fetchBranch(2, 1);
-        $this->assertInstanceOf('DoctrineExtensions\NestedSet\NodeWrapper', $root, '->fetchTree() returns a NodeWrapper object');
+        $this->assertInstanceOf(\DoctrineExtensions\NestedSet\NodeWrapper::class, $root, '->fetchTree() returns a NodeWrapper object');
 
         //
         // NOTE: Testing private variables
@@ -333,7 +333,7 @@ class ManagerTest extends DatabaseTest
     {
         $em = $this->getEntityManager();
         $logger = $this->getSqlLogger();
-        $this->loadSchema(array($em->getClassMetadata('DoctrineExtensions\NestedSet\Tests\Mocks\RelatedObj')));
+        $this->loadSchema([$em->getClassMetadata(\DoctrineExtensions\NestedSet\Tests\Mocks\RelatedObj::class)]);
         $this->loadData();
 
         foreach($this->nodes as $node)
@@ -343,11 +343,11 @@ class ManagerTest extends DatabaseTest
         $em->flush();
 
         $em->clear();
-        $logger->queries = array();
+        $logger->queries = [];
 
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('n, r')
-            ->from('DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock', 'n')
+            ->from(\DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock::class, 'n')
             ->innerJoin('n.related', 'r');
         $this->nsm->getConfiguration()->setBaseQueryBuilder($qb);
 
@@ -370,7 +370,7 @@ class ManagerTest extends DatabaseTest
 
         $node = new NodeMock(21, '1');
         $wrapper = $this->nsm->createRoot($node);
-        $this->assertInstanceOf('DoctrineExtensions\NestedSet\NodeWrapper', $wrapper, '->createRoot() returns a NodeWrapper()');
+        $this->assertInstanceOf(\DoctrineExtensions\NestedSet\NodeWrapper::class, $wrapper, '->createRoot() returns a NodeWrapper()');
         $this->assertEquals(1, $wrapper->getLeftValue(), '->createRoot() sets left value');
         $this->assertEquals(2, $wrapper->getRightValue(), '->createRoot() sets right value');
         $this->assertEquals(21, $wrapper->getRootValue(), '->createRoot() sets root value');
@@ -398,7 +398,7 @@ class ManagerTest extends DatabaseTest
 
         $node = new NodeMock(null, '1');
         $wrapper = $this->nsm->createRoot($node);
-        $this->assertInstanceOf('DoctrineExtensions\NestedSet\NodeWrapper', $wrapper, '->createRoot() returns a NodeWrapper()');
+        $this->assertInstanceOf(\DoctrineExtensions\NestedSet\NodeWrapper::class, $wrapper, '->createRoot() returns a NodeWrapper()');
         $this->assertEquals($wrapper->getId(), $wrapper->getRootValue(), '->createRoot() sets root value');
     }
 
@@ -410,7 +410,7 @@ class ManagerTest extends DatabaseTest
     {
         $node = new NodeMock(1, '1');
         $wrapper = $this->nsm->wrapNode($node);
-        $this->assertInstanceOf('DoctrineExtensions\NestedSet\NodeWrapper', $wrapper, '->wrapNode returns NodeWrapper object');
+        $this->assertInstanceOf(\DoctrineExtensions\NestedSet\NodeWrapper::class, $wrapper, '->wrapNode returns NodeWrapper object');
     }
 
 
@@ -447,7 +447,7 @@ class ManagerTest extends DatabaseTest
      */
     public function testGetEntityManager()
     {
-        $this->assertInstanceOf('Doctrine\ORM\EntityManager', $this->nsm->getEntityManager(), '->getEntityManager() returns instance of EntityManager');
+        $this->assertInstanceOf(\Doctrine\ORM\EntityManager::class, $this->nsm->getEntityManager(), '->getEntityManager() returns instance of EntityManager');
     }
 
 
@@ -456,7 +456,7 @@ class ManagerTest extends DatabaseTest
      */
     public function testGetConfiguration()
     {
-        $this->assertInstanceOf('DoctrineExtensions\NestedSet\Config', $this->nsm->getConfiguration(), '->getConfiguration() works');
+        $this->assertInstanceOf(\DoctrineExtensions\NestedSet\Config::class, $this->nsm->getConfiguration(), '->getConfiguration() works');
     }
 
 
@@ -465,11 +465,11 @@ class ManagerTest extends DatabaseTest
      */
     public function testUpdateLeftValues()
     {
-        $wrappers = array(
+        $wrappers = [
             $this->nsm->wrapNode(new NodeMock(1, '1', 1, 6)),
             $this->nsm->wrapNode(new NodeMock(2, '1.1', 2, 3)),
             $this->nsm->wrapNode(new NodeMock(3, '1.2', 4, 5)),
-        );
+        ];
 
         $this->nsm->updateLeftValues(2, 0, 2, 1);
 
@@ -482,11 +482,11 @@ class ManagerTest extends DatabaseTest
      */
     public function testUpdateRightValues()
     {
-        $wrappers = array(
+        $wrappers = [
             $this->nsm->wrapNode(new NodeMock(1, '1', 1, 6)),
             $this->nsm->wrapNode(new NodeMock(2, '1.1', 2, 3)),
             $this->nsm->wrapNode(new NodeMock(3, '1.2', 4, 5)),
-        );
+        ];
 
         $this->nsm->updateRightValues(2, 0, 2, 1);
 
@@ -502,11 +502,11 @@ class ManagerTest extends DatabaseTest
         // Make sure updateValues can be called with no registered wrappers
         $this->nsm->updateValues(1, 0, 2, 1, 15);
 
-        $wrappers = array(
+        $wrappers = [
             $this->nsm->wrapNode(new NodeMock(1, '1', 1, 6)),
             $this->nsm->wrapNode(new NodeMock(2, '1.1', 2, 3)),
             $this->nsm->wrapNode(new NodeMock(3, '1.2', 4, 5)),
-        );
+        ];
 
         $this->nsm->updateValues(1, 0, 2, 1, 15);
 
@@ -521,11 +521,11 @@ class ManagerTest extends DatabaseTest
      */
     public function testRemoveNodes()
     {
-        $wrappers = array(
+        $wrappers = [
             $this->nsm->wrapNode(new NodeMock(1, '1', 1, 6)),
             $this->nsm->wrapNode(new NodeMock(2, '1.1', 2, 3)),
             $this->nsm->wrapNode(new NodeMock(3, '1.2', 4, 5)),
-        );
+        ];
 
         $this->nsm->removeNodes(2,3,1);
         $this->assertFalse($this->nsm->wrapperExists($wrappers[1]->getId()), '->removeNodes() removes node from manager');
@@ -538,7 +538,7 @@ class ManagerTest extends DatabaseTest
      */
     public function testFilterNodeDepth_Empty()
     {
-        $this->assertEmpty($this->nsm->filterNodeDepth(array(), 1), '->filterNodeDepth() returns an empty array when given an empty array');
+        $this->assertEmpty($this->nsm->filterNodeDepth([], 1), '->filterNodeDepth() returns an empty array when given an empty array');
         $this->assertEmpty($this->nsm->filterNodeDepth($this->nodes, 0), '->filterNodeDepth() returns an empty array for depth=0');
     }
 }

@@ -26,32 +26,25 @@ use DoctrineExtensions\NestedSet\Node;
  */
 class SingleRootNodeMock implements Node
 {
-    /**
-     * @Id @Column(type="integer")
-     */
-    private $id;
-
-    /**
-     * @Column(type="integer")
-     */
-    private $lft;
-
-    /**
-     * @Column(type="integer")
-     */
-    private $rgt;
-
-    /**
-     * @Column(type="string", length="16")
-     */
-    private $name;
-
-    public function __construct($id, $name=null, $lft=null, $rgt=null)
+    public function __construct(
+        /**
+         * @Id @Column(type="integer")
+         */
+        private $id,
+        /**
+         * @Column(type="string", length="16")
+         */
+        private $name=null,
+        /**
+         * @Column(type="integer")
+         */
+        private $lft=null,
+        /**
+         * @Column(type="integer")
+         */
+        private $rgt=null
+    )
     {
-        $this->id  = $id;
-        $this->lft = $lft;
-        $this->rgt = $rgt;
-        $this->name = $name;
     }
 
     public function getId() { return $this->id; }
@@ -68,5 +61,5 @@ class SingleRootNodeMock implements Node
     public function getName() { return $this->name; }
     public function setName($name) { $this->name = $name; }
 
-    public function __toString() { return $this->name; }
+    public function __toString(): string { return (string) $this->name; }
 }

@@ -33,10 +33,6 @@ class NodeWrapper implements Node
     private $node;
 
 
-    /** @var Manager */
-    private $manager;
-
-
     /** @var NodeWrapper */
     private $parent = null;
 
@@ -56,7 +52,7 @@ class NodeWrapper implements Node
 
 
 
-    public function __construct(Node $node, Manager $manager)
+    public function __construct(Node $node, private Manager $manager)
     {
         if($node instanceof NodeWrapper)
         {
@@ -64,7 +60,6 @@ class NodeWrapper implements Node
         }
 
         $this->node = $node;
-        $this->manager = $manager;
     }
 
 
@@ -182,7 +177,7 @@ class NodeWrapper implements Node
     {
         if(!$this->hasChildren())
         {
-            return array();
+            return [];
         }
 
         if($this->descendants === null)
@@ -208,7 +203,7 @@ class NodeWrapper implements Node
 			}
             $results = $q->getResult();
 
-            $this->descendants = array();
+            $this->descendants = [];
             foreach($results as $result)
             {
                 $this->descendants[] = $this->getManager()->wrapNode($result);
@@ -265,7 +260,7 @@ class NodeWrapper implements Node
 				$q = $this->getManager()->addHintToQuery($q);
 			}
 			$results = $q->getResult();
-			
+
             $this->parent = $this->getManager()->wrapNode($results[0]);
         }
 
@@ -282,7 +277,7 @@ class NodeWrapper implements Node
     {
         if($this->isRoot())
         {
-            return array();
+            return [];
         }
 
         if($this->ancestors === null)
@@ -307,7 +302,7 @@ class NodeWrapper implements Node
 			}
 			$results = $q->getResult();
 
-            $this->ancestors = array();
+            $this->ancestors = [];
             foreach($results as $result)
             {
                 $this->ancestors[] = $this->getManager()->wrapNode($result);
@@ -345,7 +340,7 @@ class NodeWrapper implements Node
      */
     public function getPath($separator=' > ', $includeNode=false)
     {
-        $path = array();
+        $path = [];
 
         $ancestors = $this->getAncestors();
         if($ancestors)
@@ -379,7 +374,7 @@ class NodeWrapper implements Node
     {
         if($this->outlineNumbers === null)
         {
-            $numbers = array(1);
+            $numbers = [1];
 
             if(!$this->isRoot())
             {
@@ -391,7 +386,7 @@ class NodeWrapper implements Node
                 $siblingNumber = 1;
                 $level = 1;
                 $pathLevel = 1;
-                $stack = array();
+                $stack = [];
                 foreach($rootDescendants as $wrapper)
                 {
                     $parent = end($stack);
@@ -436,10 +431,10 @@ class NodeWrapper implements Node
 
         if($includeRoot === false)
         {
-            return implode(array_slice($this->outlineNumbers, 1), $separator);
+            return implode($separator, array_slice($this->outlineNumbers, 1));
         }
 
-        return implode($this->outlineNumbers, $separator);
+        return implode($separator, $this->outlineNumbers);
     }
 
 
@@ -479,7 +474,7 @@ class NodeWrapper implements Node
     public function getSiblings($includeNode=false)
     {
         $parent = $this->getParent();
-        $siblings = array();
+        $siblings = [];
         if($parent && $parent->isValidNode())
         {
             $children = $parent->getChildren();
@@ -665,7 +660,7 @@ class NodeWrapper implements Node
 
             // Slide child nodes over one and down one to allow new parent to wrap them
             $qb = $em->createQueryBuilder()
-                ->update(get_class($this->getNode()), 'n')
+                ->update($this->getNode()::class, 'n')
                 ->set("n.$lftField", "n.$lftField + 1")
                 ->set("n.$rgtField", "n.$rgtField + 1")
                 ->where("n.$lftField >= ?1")
@@ -1035,7 +1030,7 @@ class NodeWrapper implements Node
 
         if(!$this->hasManyRoots())
         {
-            throw new \BadMethodCallException(sprintf('%s::%s is only supported on multiple root trees', __CLASS__, __METHOD__));
+            throw new \BadMethodCallException(sprintf('%s::%s is only supported on multiple root trees', self::class, __METHOD__));
         }
 
         $em = $this->getManager()->getEntityManager();
@@ -1054,7 +1049,7 @@ class NodeWrapper implements Node
             // Update descendants lft/rgt/root values
            $diff = 1 - $oldLft;
             $qb = $em->createQueryBuilder()
-                ->update(get_class($this->getNode()), 'n')
+                ->update($this->getNode()::class, 'n')
                 ->set("n.$lftField", "n.$lftField + ?1")
                 ->setParameter(1, $diff)
                 ->set("n.$rgtField", "n.$rgtField + ?2")
@@ -1169,7 +1164,7 @@ class NodeWrapper implements Node
         try
         {
             $qb = $em->createQueryBuilder()
-                ->delete(get_class($this->getNode()), 'n')
+                ->delete($this->getNode()::class, 'n')
                 ->where("n.$lftField >= ?1")
                 ->setParameter(1, $oldLft)
                 ->andWhere("n.$rgtField <= ?2")
@@ -1277,11 +1272,11 @@ class NodeWrapper implements Node
     {
         $em = $this->getManager()->getEntityManager();
 
-        foreach(array($this->getLeftFieldName(), $this->getRightFieldName()) as $field)
+        foreach([$this->getLeftFieldName(), $this->getRightFieldName()] as $field)
         {
             // Prepare left & right query
-            $metadata = $em->getClassMetadata(get_class($this->getNode()));
-            $q = $em->createQueryBuilder()            
+            $metadata = $em->getClassMetadata($this->getNode()::class);
+            $q = $em->createQueryBuilder()
             ->update($metadata->rootEntityName, 'n')
             ->set("n.$field", "n.$field + :delta")
             ->setParameter('delta', $delta)
@@ -1325,7 +1320,7 @@ class NodeWrapper implements Node
         if(!$this->hasManyRoots())
         {
             // @codeCoverageIgnoreStart
-            throw new \BadMethodCallException(sprintf('%s::%s is only supported on multiple root trees', __CLASS__, __METHOD__));
+            throw new \BadMethodCallException(sprintf('%s::%s is only supported on multiple root trees', self::class, __METHOD__));
             // @codeCoverageIgnoreEnd
         }
 
@@ -1353,7 +1348,7 @@ class NodeWrapper implements Node
         $diff = $this->getLeftValue() - $oldLft;
         //echo "\nRelocating: oldLft=$oldLft, oldRgt=$oldRgt, diff=$diff, oldRoot=$oldRoot, newRoot=$newRoot\n";
         $qb = $em->createQueryBuilder()
-            ->update(get_class($this->getNode()), 'n')
+            ->update($this->getNode()::class, 'n')
             ->set("n.$lftField", "n.$lftField + ?1")
             ->setParameter(1, $diff)
             ->set("n.$rgtField", "n.$rgtField + ?2")
@@ -1581,7 +1576,7 @@ class NodeWrapper implements Node
     {
         if($this->children === null)
         {
-            $this->children = array();
+            $this->children = [];
         }
 
         $this->children[] = $child;
@@ -1595,7 +1590,7 @@ class NodeWrapper implements Node
     {
         if($this->descendants === null)
         {
-            $this->descendants = array();
+            $this->descendants = [];
         }
 
         $this->descendants[] = $descendant;
@@ -1648,7 +1643,7 @@ class NodeWrapper implements Node
         return $this->getNode()->getId();
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getNode()->__toString();
     }

@@ -37,13 +37,13 @@ class ConfigTest extends DatabaseTest
      */
     public function testConstructor()
     {
-        $this->assertInstanceOf('DoctrineExtensions\NestedSet\Config', $this->config, '->__construct() works with default parameters');
+        $this->assertInstanceOf(\DoctrineExtensions\NestedSet\Config::class, $this->config, '->__construct() works with default parameters');
 
-        $clazz = 'DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock';
-        $this->assertInstanceOf('DoctrineExtensions\NestedSet\Config', new Config($this->getEntityManager(), $clazz), '->construct() works with a classname');
+        $clazz = \DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock::class;
+        $this->assertInstanceOf(\DoctrineExtensions\NestedSet\Config::class, new Config($this->getEntityManager(), $clazz), '->construct() works with a classname');
 
         $metadata = $this->getEntityManager()->getClassMetadata($clazz);
-        $this->assertInstanceOf('DoctrineExtensions\NestedSet\Config', new Config($this->getEntityManager(), $metadata), '->construct() works with metadata');
+        $this->assertInstanceOf(\DoctrineExtensions\NestedSet\Config::class, new Config($this->getEntityManager(), $metadata), '->construct() works with metadata');
 
         $this->assertEquals('lft', $this->config->getLeftFieldName(), '->__construct() sets default left field name');
         $this->assertEquals('rgt', $this->config->getRightFieldName(), '->__construct() sets default right field name');
@@ -70,7 +70,7 @@ class ConfigTest extends DatabaseTest
      */
     public function testSetNonEntityClass()
     {
-        $this->config->setClass('DoctrineExtensions\NestedSet\Tests\ConfigTest');
+        $this->config->setClass(\DoctrineExtensions\NestedSet\Tests\ConfigTest::class);
     }
 
 
@@ -80,7 +80,7 @@ class ConfigTest extends DatabaseTest
      */
     public function testSetNonNodeClass()
     {
-        $this->config->setClass('DoctrineExtensions\NestedSet\Tests\Mocks\NonNodeMock');
+        $this->config->setClass(\DoctrineExtensions\NestedSet\Tests\Mocks\NonNodeMock::class);
     }
 
     /**
@@ -112,7 +112,7 @@ class ConfigTest extends DatabaseTest
      */
     public function testSetClass()
     {
-        $clazz = 'DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock';
+        $clazz = \DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock::class;
         $metadata = $this->getEntityManager()->getClassMetadata($clazz);
         $this->config->setClass($metadata);
         $this->assertEquals($clazz, $this->config->getClassname(), '->setClass() accepts a metadata object');
@@ -128,7 +128,7 @@ class ConfigTest extends DatabaseTest
      */
     public function testGetEntityManager()
     {
-        $this->assertInstanceOf('Doctrine\ORM\EntityManager', $this->config->getEntityManager(), '->getEntityManager() returns EntityManager');
+        $this->assertInstanceOf(\Doctrine\ORM\EntityManager::class, $this->config->getEntityManager(), '->getEntityManager() returns EntityManager');
     }
 
 
@@ -170,10 +170,10 @@ class ConfigTest extends DatabaseTest
      */
     public function testIsSingleRoot()
     {
-        $this->config->setClass('DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock');
+        $this->config->setClass(\DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock::class);
         $this->assertTrue($this->config->hasManyRoots(), '->hasManyRoots() returns true for MutlipleRootNode node');
 
-        $this->config->setClass('DoctrineExtensions\NestedSet\Tests\Mocks\SingleRootNodeMock');
+        $this->config->setClass(\DoctrineExtensions\NestedSet\Tests\Mocks\SingleRootNodeMock::class);
         $this->assertFalse($this->config->hasManyRoots(), '->hasManyRoots() returns false for Node node');
     }
 
@@ -189,7 +189,7 @@ class ConfigTest extends DatabaseTest
 
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('y')
-            ->from('DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock', 'y');
+            ->from(\DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock::class, 'y');
         $this->config->setBaseQueryBuilder($qb);
         $this->assertEquals($qb, $this->config->getBaseQueryBuilder(), '->setBaseQueryBuilder() sets a QueryBuilder object');
         $this->assertNotSame($qb, $this->config->getBaseQueryBuilder(), '->getBaseQueryBuilder() returns a clone of the base query builder object');
@@ -209,7 +209,7 @@ class ConfigTest extends DatabaseTest
 
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('y')
-            ->from('DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock', 'y');
+            ->from(\DoctrineExtensions\NestedSet\Tests\Mocks\NodeMock::class, 'y');
         $this->config->setBaseQueryBuilder($qb);
 
         $this->config->resetBaseQueryBuilder();
@@ -223,7 +223,7 @@ class ConfigTest extends DatabaseTest
     public function testGetDefaultQueryBuilder()
     {
         $qb = $this->config->getDefaultQueryBuilder();
-        $this->assertInstanceOf('Doctrine\ORM\QueryBuilder', $qb, '->getDefaultQueryBuilder() returns QueryBuilder object');
+        $this->assertInstanceOf(\Doctrine\ORM\QueryBuilder::class, $qb, '->getDefaultQueryBuilder() returns QueryBuilder object');
     }
 
 

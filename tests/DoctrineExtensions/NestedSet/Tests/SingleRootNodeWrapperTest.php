@@ -34,20 +34,20 @@ class SingleRootNodeWrapperTest extends DatabaseTest
     protected function setUp()
     {
         $em = $this->getEntityManager();
-        $this->loadSchema(array($em->getClassMetadata('DoctrineExtensions\NestedSet\Tests\Mocks\SingleRootNodeMock')));
+        $this->loadSchema([$em->getClassMetadata(\DoctrineExtensions\NestedSet\Tests\Mocks\SingleRootNodeMock::class)]);
 
-        $this->nsm = new ManagerMock($em, 'DoctrineExtensions\NestedSet\Tests\Mocks\SingleRootNodeMock');
+        $this->nsm = new ManagerMock($em, \DoctrineExtensions\NestedSet\Tests\Mocks\SingleRootNodeMock::class);
         $this->nsm->getConfiguration()->setRootFieldName(null);
 
-        $this->nodes = array(
+        $this->nodes = [
             new SingleRootNodeMock(1, '1', 1, 10),               # 0
                 new SingleRootNodeMock(2, '1.1', 2, 7),          # 1
                     new SingleRootNodeMock(3, '1.1.1', 3, 4),    # 2
                     new SingleRootNodeMock(4, '1.1.2', 5, 6),    # 3
                 new SingleRootNodeMock(5, '1.2', 8, 9),          # 4
-        );
+        ];
 
-        $this->wrappers = array();
+        $this->wrappers = [];
         foreach($this->nodes as $node)
         {
             $em->persist($node);
@@ -75,14 +75,14 @@ class SingleRootNodeWrapperTest extends DatabaseTest
     {
         $c = $this->wrappers[1]->getChildren();
         $this->assertEquals(
-            array($this->nodes[2]->getId(), $this->nodes[3]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $c)
+            [$this->nodes[2]->getId(), $this->nodes[3]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $c)
         );
 
         $c = $this->wrappers[0]->getChildren();
         $this->assertEquals(
-            array($this->nodes[1]->getId(), $this->nodes[4]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $c)
+            [$this->nodes[1]->getId(), $this->nodes[4]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $c)
         );
 
         $this->assertEmpty($this->wrappers[2]->getChildren(), 'no children');
@@ -97,8 +97,8 @@ class SingleRootNodeWrapperTest extends DatabaseTest
     {
         $d = $this->wrappers[1]->getDescendants();
         $this->assertEquals(
-            array($this->nodes[2]->getId(), $this->nodes[3]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $d),
+            [$this->nodes[2]->getId(), $this->nodes[3]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $d),
             '->getDescendants() depth=unlimited'
         );
 
@@ -106,15 +106,15 @@ class SingleRootNodeWrapperTest extends DatabaseTest
 
         $d = $this->wrappers[0]->getDescendants(1);
         $this->assertEquals(
-            array($this->nodes[1]->getId(), $this->nodes[4]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $d),
+            [$this->nodes[1]->getId(), $this->nodes[4]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $d),
             '->getDescendants() depth=1'
         );
 
         $d = $this->wrappers[0]->getDescendants(2);
         $this->assertEquals(
-            array($this->nodes[1]->getId(), $this->nodes[2]->getId(), $this->nodes[3]->getId(), $this->nodes[4]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $d),
+            [$this->nodes[1]->getId(), $this->nodes[2]->getId(), $this->nodes[3]->getId(), $this->nodes[4]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $d),
             '->getDescendants() depth=2'
         );
     }
@@ -127,15 +127,15 @@ class SingleRootNodeWrapperTest extends DatabaseTest
     {
         $siblings = $this->wrappers[2]->getSiblings();
         $this->assertEquals(
-            array($this->nodes[3]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $siblings),
+            [$this->nodes[3]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $siblings),
             '->getSiblings() excludes current node by default'
         );
 
         $siblings = $this->wrappers[2]->getSiblings(true);
         $this->assertEquals(
-            array($this->nodes[2]->getId(), $this->nodes[3]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $siblings),
+            [$this->nodes[2]->getId(), $this->nodes[3]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $siblings),
             '->getSiblings() includes current node'
         );
     }
@@ -161,8 +161,8 @@ class SingleRootNodeWrapperTest extends DatabaseTest
     {
         $a = $this->wrappers[3]->getAncestors();
         $this->assertEquals(
-            array($this->nodes[0]->getId(), $this->nodes[1]->getId()),
-            array_map(function($node) {return $node->getNode()->getId();}, $a)
+            [$this->nodes[0]->getId(), $this->nodes[1]->getId()],
+            array_map(fn($node) => $node->getNode()->getId(), $a)
         );
 
         $this->assertEmpty($this->wrappers[0]->getAncestors());

@@ -98,7 +98,7 @@ class Config
             {
                 $namespace = $this->getEntityManager()->getConfiguration()->getEntityNamespace($alias);
             }
-            catch (\Doctrine\ORM\ORMException $e) {
+            catch (\Doctrine\ORM\ORMException) {
                 throw new \InvalidArgumentException("Can't find class: $clazz'");
             }
 
@@ -107,12 +107,12 @@ class Config
         }
 
         $reflectionClass = $classMetadata->getReflectionClass();
-        if(!$reflectionClass->implementsInterface('DoctrineExtensions\NestedSet\Node'))
+        if(!$reflectionClass->implementsInterface(\DoctrineExtensions\NestedSet\Node::class))
         {
             throw new \InvalidArgumentException('Class must implement Node interface: ' . $classname);
         }
 
-        $this->hasManyRoots = $reflectionClass->implementsInterface('DoctrineExtensions\NestedSet\MultipleRootNode');
+        $this->hasManyRoots = $reflectionClass->implementsInterface(\DoctrineExtensions\NestedSet\MultipleRootNode::class);
         $this->classMetadata = $classMetadata;
         $this->classname = $classname;
 

@@ -43,7 +43,7 @@ class Manager
     public function __construct(Config $config)
     {
         $this->config = $config;
-        $this->wrappers = array();
+        $this->wrappers = [];
     }
 
 
@@ -89,7 +89,7 @@ class Manager
 
         if($depth === 0)
         {
-            return array();
+            return [];
         }
 
         $qb = $config->getBaseQueryBuilder();
@@ -113,7 +113,7 @@ class Manager
 		
         if(empty($nodes))
         {
-            return array();
+            return [];
         }
 
         // TODO: Filter depth using a cross join instead of this
@@ -122,7 +122,7 @@ class Manager
             $nodes = $this->filterNodeDepth($nodes, $depth);
         }
 
-        $wrappers = array();
+        $wrappers = [];
         foreach($nodes as $node)
         {
             $wrappers[] = $this->wrapNode($node);
@@ -172,14 +172,14 @@ class Manager
 
         if($depth === 0)
         {
-            return array();
+            return [];
         }
 
         $node = $this->getEntityManager()->find($this->getConfiguration()->getClassname(), $pk);
 
         if(!$node)
         {
-            return array();
+            return [];
         }
 
         $qb = $config->getBaseQueryBuilder();
@@ -218,7 +218,7 @@ class Manager
             $nodes = $this->filterNodeDepth($nodes, $depth);
         }
 
-        $wrappers = array();
+        $wrappers = [];
         foreach($nodes as $node)
         {
             $wrappers[] = $this->wrapNode($node);
@@ -306,7 +306,7 @@ class Manager
      */
     public function reset()
     {
-        $this->wrappers = array();
+        $this->wrappers = [];
     }
 
 
@@ -447,7 +447,7 @@ class Manager
     {
         $hasManyRoots = $this->getConfiguration()->hasManyRoots();
 
-        $removed = array();
+        $removed = [];
         foreach($this->wrappers as $oid => $wrapper)
         {
             if(!$hasManyRoots || ($wrapper->getRootValue() == $root))
@@ -486,11 +486,11 @@ class Manager
     {
         if(empty($nodes) || $depth === 0)
         {
-            return array();
+            return [];
         }
 
-        $newNodes = array();
-        $stack = array();
+        $newNodes = [];
+        $stack = [];
         $level = 0;
 
         foreach($nodes as $node)
@@ -540,7 +540,7 @@ class Manager
         $config = $this->getConfiguration();
 
         $rootNode = $wrappers[0];
-        $stack = array();
+        $stack = [];
 
         $level = 0;
         if($config->getHydrateLevel())
@@ -548,7 +548,7 @@ class Manager
             $level = $wrappers[0]->getLevel();
         }
 
-        $outlineNumbers = array(0);
+        $outlineNumbers = [0];
         if($config->getHydrateOutlineNumber())
         {
             $outlineNumbers = explode('.', $wrappers[0]->getOutlineNumber('.', true));
